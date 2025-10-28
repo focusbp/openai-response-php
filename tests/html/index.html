@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>OpenAI Response PHP</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="style.css">
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	</head>
+	<body>
+
+		<section>
+			<a href="index.php?sync=true">Sync Vector Store</a>
+			<a href="index.php">Start Over</a>
+			<div id="history_area">
+				<div class="left_content">I can answer about events and weather. Try asking things like "What upcoming events are there?" or "What's the weather tomorrow?"</div>
+			</div>
+
+			<div id="chat_status_area"></div>
+
+			<form id="form">
+				<textarea id="chat_textarea" name="msg"></textarea>
+				<button id="submit_button" data-function="send_message" type="button">Submit</button>
+			</form>
+		</section>
+
+		<script>
+			$(function () {
+				$('#submit_button').on('click', function (e) {
+					e.preventDefault(); // stop default form submission
+
+					var $btn = $('#submit_button');
+					var $status = $('#chat_status_area');
+					var msg = $('#chat_textarea').val();
+
+					if (!msg.trim()) {
+						$status.text('Please enter a message');
+						return;
+					}
+
+					$btn.prop('disabled', true);
+					$('#chat_textarea').val('');
+					$status.text('Sending...');
+					startStatusWatcher("chat_status_area");
+
+					$.ajax({
+						url: 'index.php',
+						method: 'POST',
+						data: {msg: msg}          // send with the same key as name="msg"
+						// set dataType if needed depending on the response (e.g. 'json')
+					})
+							.done(function (res) {
+								let messages;
+								try {
+									messages = (typeof res === 'string') ? JSON.parse(res) : res;
+								} catch (e) {
+									console.error('JSON parse error:', e, res);
+									$('#history_area').text('Failed to parse response: ' + res);
+									return;
+								}
+
+								// 2) extract assistant / user content 3) render
+								renderHistory(messages);
+								$status.text('');
+							})
+							.fail(function (xhr, status, err) {
+								$status.text('Failed to send: ' + (err || status));
+							})
+							.always(function () {
+								$btn.prop('disabled', false);
+								setTimeout(function () {
+									$status.text('');
+								}, 1500);
+							});
+				});
+
+				function renderHistory(list) {
+					const $area = $('#history_area');
+					$area.empty(); // clear once
+
+					if (!Array.isArray(list))
+						return;
+
+					list.forEach(function (item) {
+						if (!item || !item.content)
+							return;
+						const role = String(item.role || '').toLowerCase();
+
+						// safely convert content to text → replace only newlines with <br>
+						const $tmp = $('<div>').text(String(item.content));
+						const safeHtml = $tmp.html().replace(/\n/g, '<br>');
+
+						// assign class depending on role
+						const $bubble = $('<div>')
+								.addClass(role === 'user' ? 'right_content' : 'left_content') // default is treated as assistant
+								.html(safeHtml);
+
+						$area.append($bubble);
+					});
+				}
+
+			});
+
+
+			function startStatusWatcher(idForDisplay) {
+				const INTERVAL_MS = 2000;
+				let timerId = null;
+
+				const $statusEl = document.getElementById(idForDisplay);
+				if (!$statusEl) {
+					console.error('[StatusWatcher] DOM element not found:', idForDisplay);
+					return;
+				}
+
+				$statusEl.textContent = "Start AI Processing..."
+
+				async function fetchStatusOnce() {
+
+					try {
+						const params = new URLSearchParams({
+						});
+
+						const res = await fetch('status_poll.php?' + params.toString(), {
+							method: 'GET',
+							headers: {
+								'Accept': 'application/json'
+							},
+							cache: 'no-store'
+						});
+
+						if (!res.ok) {
+							throw new Error('HTTP ' + res.status);
+						}
+
+						const data = await res.json();
+
+						if (!data.ok) {
+							console.warn('[StatusWatcher] server reported error:', data.error || 'unknown');
+							$statusEl.textContent = 'A communication error occurred.';
+							stopPolling();
+							return;
+						}
+
+						if (data.status_message !== undefined && data.status_message !== null) {
+							$statusEl.textContent = data.status_message;
+						}
+
+						if (data.done === true) {
+							$statusEl.textContent = "";
+							stopPolling();
+						}
+
+					} catch (err) {
+						console.error('[StatusWatcher] fetchStatusOnce failed:', err);
+						$statusEl.textContent = 'Communication failed.';
+						stopPolling();
+					}
+				}
+
+				function startPolling() {
+
+					fetchStatusOnce;
+					// repeat after this
+					timerId = setInterval(fetchStatusOnce, INTERVAL_MS);
+				}
+
+				function stopPolling() {
+					if (timerId !== null) {
+						clearInterval(timerId);
+						timerId = null;
+					}
+				}
+
+				// start here
+				startPolling();
+
+				// return stop() so callers can explicitly stop it if needed
+				return {
+					stop: stopPolling
+				};
+			}
+		</script>
+
+
+	</body>
+</html>

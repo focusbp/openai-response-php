@@ -1,0 +1,10 @@
+{
+  "name": "soshiki-kaikaku/openai-response-php",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "focusbp\\OpenAIResponsePhp\\": "src/focusbp/OpenAIResponsePhp/"
+    }
+  },
+  "require": {}
+}
