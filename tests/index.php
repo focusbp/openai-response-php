@@ -64,7 +64,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if($method == 'GET'){
 	
-	if($_GET["sync"] == "true"){
+	if (($_GET['sync'] ?? '') === 'true') {
 		$openai->syncVectorStore();
 	}
 	
