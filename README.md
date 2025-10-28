@@ -7,6 +7,14 @@ A lightweight PHP library that wraps the OpenAI Responses API to provide:
 
 This library is intended to be easy to drop into a simple PHP app, even on older environments.
 
+## Install
+
+You can install it via Composer:
+
+```bash
+composer require focusbp/openai-response-php
+```
+
 ---
 
 ## Features
