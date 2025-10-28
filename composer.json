@@ -1,10 +1,14 @@
 {
-  "name": "soshiki-kaikaku/openai-response-php",
-  "type": "library",
-  "autoload": {
-    "psr-4": {
-      "focusbp\\OpenAIResponsePhp\\": "src/focusbp/OpenAIResponsePhp/"
-    }
-  },
-  "require": {}
+	"name": "focusbp/openai-response-php",
+	"description": "OpenAI Responses API helper for PHP with function calling and vector store sync.",
+	"type": "library",
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"focusbp\\OpenAIResponsePhp\\": "src/focusbp/OpenAIResponsePhp/"
+		}
+	},
+	"require": {
+    "php": ">=7.3"
+  }
 }
