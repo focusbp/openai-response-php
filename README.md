@@ -53,7 +53,7 @@ This is the fastest way to see it working in a browser.
 
 1. **Set your API key**
 
-   Open `tests/index.php` and set your OpenAI API key:
+   Open `tests/config/config.php` and set your OpenAI API key:
 
    ```php
    $apikey = 'sk-...';

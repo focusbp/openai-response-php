@@ -78,3 +78,12 @@ button {
 	color:#85aedf;
 	font-size: 80%;
 }
+
+.error {
+	text-align: center;
+	color:#cc0000;
+	margin-top:100px;
+	border: 1px #ccc solid;
+    padding: 20px;
+    border-radius: 10px;
+}

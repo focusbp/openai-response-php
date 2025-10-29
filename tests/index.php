@@ -14,7 +14,11 @@ use focusbp\OpenAIResponsePhp\SessionStatusManager;
 //------------
 // API KEY
 //------------
-$apikey = "";
+if(is_file("config_dev/config.php")){
+	include "config_dev/config.php";
+}else{
+	include "config/config.php";
+}
 
 if(empty($apikey)){
 	$html = file_get_contents("html/error.html");
