@@ -32,7 +32,8 @@ if(empty($apikey)){
 //------------
 $vector_store_dir = __DIR__ . "/vector_store";
 $vector_store_name = "test";
-$vector_store_id_file = __DIR__ . "/log/vector_store_id.txt";
+$log_dir = __DIR__ . "/log";
+$vector_store_id_file = $log_dir . "/vector_store_id.txt";
 $tools_dir = __DIR__ . "/function_tools";
 $model = "gpt-5";
 $logfile = __DIR__ . "/log/log.txt";
@@ -43,6 +44,10 @@ $logfile = __DIR__ . "/log/log.txt";
 $vectorStorID = null;
 if(is_file($vector_store_id_file)){
 	$vectorStorID = file_get_contents($vector_store_id_file);
+}
+
+if(!is_dir($log_dir)){
+	mkdir($log_dir);
 }
 
 //------------------
