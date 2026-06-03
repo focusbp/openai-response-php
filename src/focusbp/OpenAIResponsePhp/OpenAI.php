@@ -596,14 +596,12 @@ class OpenAI {
 
 		$raw = curl_exec($ch);
 
-		if ($raw === false) {
-			$err = curl_error($ch);
-			curl_close($ch);
-			throw new \RuntimeException('cURL error: ' . $err);
-		}
+			if ($raw === false) {
+				$err = curl_error($ch);
+				throw new \RuntimeException('cURL error: ' . $err);
+			}
 
-		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);
+			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 		$resp = json_decode($raw, true);
 
@@ -799,8 +797,7 @@ class OpenAI {
 		    },
 		    CURLOPT_TIMEOUT => 0,
 		]);
-		curl_exec($ch);
-		curl_close($ch);
+			curl_exec($ch);
 	}
 
 	private function extractFunctionCalls(array $resp): array {
